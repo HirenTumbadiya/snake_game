@@ -1,4 +1,10 @@
+mod game;
+mod snake;
+mod grid;
+mod direction;
+
 use macroquad::prelude::*;
+use game::SnakeGame;
 
 
 fn window_conf() -> Conf {
@@ -13,8 +19,12 @@ fn window_conf() -> Conf {
 
 #[macroquad::main(window_conf)]
 async fn main() {
+    let mut game = SnakeGame::new();
+
     loop {
-        clear_background(BLACK);
+        game.update();
+        game.draw();
+
         next_frame().await;
     }
 }
