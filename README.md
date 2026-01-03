@@ -31,8 +31,4 @@ Releases / Download button for Windows
 
 `https://github.com/HirenTumbadiya/snake_game/releases/latest/download/<ASSET_NAME>`
 
-Example Markdown button linking to the latest attached exe:
-
-```markdown
-[Download for Windows](https://github.com/HirenTumbadiya/snake_game/releases/latest/download/snake_game.exe)
-```
+[![Download for Windows](https://img.shields.io/badge/Download-Windows-blue?style=for-the-badge&logo=windows)](https://github.com/HirenTumbadiya/snake_game/releases/latest/download/snake_game.exe)
