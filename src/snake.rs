@@ -22,7 +22,7 @@ impl Snake {
         *self.body.front().unwrap()
     }
 
-    pub fn move_forward(&mut self) {
+    pub fn next_head(&self) -> Position {
         let head = self.head();
 
         let new_head = match self.dir {
@@ -32,7 +32,14 @@ impl Snake {
             Direction::Right => Position { x: head.x + 1, y: head.y },
         };
 
-        self.body.push_front(new_head);
-        self.body.pop_back();
+        new_head.wrap()
+    }
+
+    pub fn move_forward(&mut self, grow: bool) {
+        let next = self.next_head();
+        self.body.push_front(next);
+        if !grow {
+            self.body.pop_back();
+        }
     }
 }

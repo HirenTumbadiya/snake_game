@@ -2,6 +2,7 @@ mod game;
 mod snake;
 mod grid;
 mod direction;
+mod food;
 
 use macroquad::prelude::*;
 use game::SnakeGame;
