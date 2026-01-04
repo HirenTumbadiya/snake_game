@@ -9,6 +9,7 @@ pub struct SnakeGame {
     game_over: bool,
     last_move_time: f64,
     move_interval: f64,
+    speed: f32,
 }
 
 impl SnakeGame {
@@ -22,6 +23,7 @@ impl SnakeGame {
             game_over: false,
             last_move_time: get_time(),
             move_interval: 0.15,
+            speed: (1.0 / 0.15) as f32,
         }
     }
 
@@ -52,6 +54,45 @@ impl SnakeGame {
             }
         }
 
+        // speed: accelerate while holding the current movement key
+        let dt = get_frame_time(); // seconds since last frame
+        let default_speed = (1.0 / 0.15) as f32; // baseline speed
+        let speed_min = 1.0_f32;
+        let speed_max = 20.0_f32;
+        let accel_per_sec = 6.0_f32; // how fast speed increases while holding
+        let decay_per_sec = 3.0_f32; // how fast speed returns to default when not holding
+
+        // If player is holding the key that matches the current direction, accelerate
+        let mut accelerated = false;
+        if is_key_down(KeyCode::Right) && self.snake.dir == crate::direction::Direction::Right {
+            self.speed = (self.speed + accel_per_sec * dt).min(speed_max);
+            accelerated = true;
+        }
+        if is_key_down(KeyCode::Left) && self.snake.dir == crate::direction::Direction::Left {
+            self.speed = (self.speed + accel_per_sec * dt).min(speed_max);
+            accelerated = true;
+        }
+        if is_key_down(KeyCode::Up) && self.snake.dir == crate::direction::Direction::Up {
+            self.speed = (self.speed + accel_per_sec * dt).min(speed_max);
+            accelerated = true;
+        }
+        if is_key_down(KeyCode::Down) && self.snake.dir == crate::direction::Direction::Down {
+            self.speed = (self.speed + accel_per_sec * dt).min(speed_max);
+            accelerated = true;
+        }
+
+        // If not accelerating, move speed gradually back toward default
+        if !accelerated {
+            if self.speed > default_speed {
+                self.speed = (self.speed - decay_per_sec * dt).max(default_speed).max(speed_min);
+            } else if self.speed < default_speed {
+                self.speed = (self.speed + decay_per_sec * dt).min(default_speed).min(speed_max);
+            }
+        }
+
+        // update move interval to reflect current speed
+        self.move_interval = 1.0 / self.speed as f64;
+
         // if game over, listen for restart
         if self.game_over {
             if is_key_pressed(KeyCode::R) {
@@ -60,6 +101,9 @@ impl SnakeGame {
                 self.snake = snake;
                 self.game_over = false;
                 self.last_move_time = get_time();
+                // reset speed to default
+                self.move_interval = 0.15;
+                self.speed = (1.0 / 0.15) as f32;
             }
         } else {
             // movement (tick-based)
@@ -119,5 +163,9 @@ impl SnakeGame {
             let y = (grid_height() as f32 * CELL_SIZE) / 2.0;
             draw_text(text, x, y, font_size, RED);
         }
+
+        // draw speed indicator
+        let speed_text = format!("Speed: {}", self.speed as i32);
+        draw_text(&speed_text, 10.0, 24.0, 24.0, WHITE);
     }
 }
